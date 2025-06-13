@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertCircle, CheckCircle, Brain, TrendingUp, Hash, Smile } from 'lucide-react';
+import { AlertCircle, CheckCircle, Brain, TrendingUp, Hash, Smile, AlertTriangle } from 'lucide-react';
 import { PredictionResult } from '@/types/prediction';
 import { mlService } from '@/services/mlService';
 import { useToast } from '@/hooks/use-toast';
@@ -41,10 +41,19 @@ const SpamDetectionForm: React.FC<SpamDetectionFormProps> = ({ onPrediction }) =
       setResult(prediction);
       onPrediction(prediction);
       
-      toast({
-        title: "Analysis Complete",
-        description: `Comment classified as ${prediction.isSpam ? 'Spam' : 'Not Spam'} with ${(prediction.confidence * 100).toFixed(1)}% confidence.`,
-      });
+      // Show different toast messages based on spam detection
+      if (prediction.isSpam) {
+        toast({
+          title: "🚨 SPAM DETECTED!",
+          description: `Comment flagged as spam with ${(prediction.confidence * 100).toFixed(1)}% confidence. Found ${prediction.features.spammyEmojiCount} spammy emojis and ${prediction.features.spammyWordCount} spammy keywords.`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "✅ Clean Comment",
+          description: `Comment classified as legitimate with ${(prediction.confidence * 100).toFixed(1)}% confidence.`,
+        });
+      }
     } catch (error) {
       toast({
         title: "Analysis Failed",
@@ -113,7 +122,7 @@ const SpamDetectionForm: React.FC<SpamDetectionFormProps> = ({ onPrediction }) =
           <div className="text-center">
             <h3 className="text-lg font-semibold mb-2">Social Media Post Preview</h3>
             <p className="text-sm text-muted-foreground">
-              Comment has been classified and organized below
+              {result.isSpam ? "⚠️ Spam comment detected and filtered" : "✅ Clean comment displayed normally"}
             </p>
           </div>
           <InstagramPost prediction={result} />
@@ -121,25 +130,39 @@ const SpamDetectionForm: React.FC<SpamDetectionFormProps> = ({ onPrediction }) =
       )}
 
       {result && (
-        <Card className="border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
+        <Card className={`border-l-4 ${result.isSpam ? 'border-l-red-500 bg-gradient-to-r from-red-50/50 to-orange-50/50' : 'border-l-green-500 bg-gradient-to-r from-green-50/50 to-blue-50/50'}`}>
           <CardContent className="p-6">
             <div className="space-y-4">
               {/* Prediction Result */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {result.isSpam ? (
-                    <AlertCircle className="h-5 w-5 text-red-500" />
+                    <AlertTriangle className="h-5 w-5 text-red-500" />
                   ) : (
                     <CheckCircle className="h-5 w-5 text-green-500" />
                   )}
                   <span className="font-semibold">
-                    {result.isSpam ? 'Spam Detected' : 'Not Spam'}
+                    {result.isSpam ? '🚨 SPAM DETECTED' : '✅ NOT SPAM'}
                   </span>
                 </div>
                 <Badge variant={result.isSpam ? "destructive" : "default"}>
                   {(result.confidence * 100).toFixed(1)}% confidence
                 </Badge>
               </div>
+
+              {/* Spam Alert Banner */}
+              {result.isSpam && (
+                <div className="bg-red-100 border border-red-300 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-red-700 font-semibold mb-2">
+                    <AlertTriangle className="h-4 w-4" />
+                    Spam Detection Triggered
+                  </div>
+                  <div className="text-sm text-red-600">
+                    This comment contains {result.features.spammyEmojiCount} spammy emoji(s) and {result.features.spammyWordCount} spammy keyword(s).
+                    Any presence of spam indicators automatically classifies the comment as spam.
+                  </div>
+                </div>
+              )}
 
               {/* Confidence Bar */}
               <div className="space-y-2">
@@ -206,17 +229,17 @@ const SpamDetectionForm: React.FC<SpamDetectionFormProps> = ({ onPrediction }) =
                 <div className="text-sm font-medium">Spam Analysis:</div>
                 
                 {/* Spammy Emojis */}
-                <div className="bg-red-50 p-3 rounded-lg">
+                <div className={`p-3 rounded-lg ${result.features.spammyEmojiCount > 0 ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-red-700">Spammy Emojis Detected</span>
-                    <Badge variant="destructive" className="text-xs">
+                    <span className={`text-sm font-medium ${result.features.spammyEmojiCount > 0 ? 'text-red-700' : 'text-green-700'}`}>Spammy Emojis</span>
+                    <Badge variant={result.features.spammyEmojiCount > 0 ? "destructive" : "default"} className="text-xs">
                       {result.features.spammyEmojiCount} found
                     </Badge>
                   </div>
                   {result.features.spammyEmojis.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {result.features.spammyEmojis.map((emoji, index) => (
-                        <span key={index} className="text-lg bg-red-100 px-2 py-1 rounded">{emoji}</span>
+                        <span key={index} className="text-lg bg-red-100 px-2 py-1 rounded border border-red-200">{emoji}</span>
                       ))}
                     </div>
                   ) : (
@@ -225,17 +248,17 @@ const SpamDetectionForm: React.FC<SpamDetectionFormProps> = ({ onPrediction }) =
                 </div>
 
                 {/* Spammy Keywords */}
-                <div className="bg-orange-50 p-3 rounded-lg">
+                <div className={`p-3 rounded-lg ${result.features.spammyWordCount > 0 ? 'bg-orange-50 border border-orange-200' : 'bg-green-50 border border-green-200'}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-orange-700">Spammy Keywords Detected</span>
-                    <Badge variant="secondary" className="text-xs bg-orange-200">
+                    <span className={`text-sm font-medium ${result.features.spammyWordCount > 0 ? 'text-orange-700' : 'text-green-700'}`}>Spammy Keywords</span>
+                    <Badge variant={result.features.spammyWordCount > 0 ? "secondary" : "default"} className={`text-xs ${result.features.spammyWordCount > 0 ? 'bg-orange-200' : ''}`}>
                       {result.features.spammyWordCount} found
                     </Badge>
                   </div>
                   {result.features.spammyWords.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {result.features.spammyWords.map((word, index) => (
-                        <span key={index} className="text-xs bg-orange-100 px-2 py-1 rounded font-mono">
+                        <span key={index} className="text-xs bg-orange-100 px-2 py-1 rounded font-mono border border-orange-200">
                           {word}
                         </span>
                       ))}

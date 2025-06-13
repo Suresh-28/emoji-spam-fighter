@@ -1,4 +1,3 @@
-
 import { PredictionRequest, PredictionResult, BulkPredictionRequest } from '@/types/prediction';
 
 // Enhanced ML service with spammy emojis and keywords detection
@@ -85,28 +84,44 @@ class MLService {
     comment: string;
   }): { isSpam: boolean; confidence: number; modelScores: any } {
     
-    // Enhanced Logistic Regression simulation
+    // Check if ANY spammy content is detected - immediate spam classification
+    const hasSpammyContent = features.spammyEmojiCount > 0 || features.spammyWordCount > 0;
+    
+    if (hasSpammyContent) {
+      // High confidence spam detection when spammy content is found
+      let baseSpamScore = 0.7; // Start with high base score
+      
+      // Additional scoring based on spam intensity
+      if (features.spammyEmojiCount > 0) baseSpamScore += features.spammyEmojiCount * 0.1;
+      if (features.spammyWordCount > 0) baseSpamScore += features.spammyWordCount * 0.08;
+      if (features.comment.includes('👉') && features.comment.includes('🔗')) baseSpamScore += 0.15;
+      
+      const finalScore = Math.min(baseSpamScore, 0.98); // Cap at 98%
+      
+      return {
+        isSpam: true,
+        confidence: finalScore,
+        modelScores: {
+          logisticRegression: finalScore,
+          randomForest: finalScore,
+          xgboost: finalScore,
+          ensemble: finalScore
+        }
+      };
+    }
+    
+    // Original enhanced logic for non-spammy content
     let logisticScore = 0.3;
-    if (features.spammyEmojiCount > 0) logisticScore += features.spammyEmojiCount * 0.15;
-    if (features.spammyWordCount > 0) logisticScore += features.spammyWordCount * 0.12;
     if (features.emojiCount > 3) logisticScore += 0.1;
     if (features.commentLength > 200) logisticScore += 0.08;
     if (features.similarity < 0.1) logisticScore += 0.1;
-    if (features.comment.includes('👉') && features.comment.includes('🔗')) logisticScore += 0.2;
     
-    // Enhanced Random Forest simulation
     let rfScore = 0.25;
-    if (features.spammyEmojiCount > 1) rfScore += 0.25;
-    if (features.spammyWordCount > 2) rfScore += 0.2;
     if (features.emojiCount > 2) rfScore += 0.15;
     if (features.textComplexity < 2) rfScore += 0.15;
     if (features.commentLength > 100 && features.similarity < 0.2) rfScore += 0.2;
     
-    // Enhanced XGBoost simulation
     let xgboostScore = 0.35;
-    if (features.spammyEmojiCount * features.spammyWordCount > 2) xgboostScore += 0.3;
-    if (features.spammyWordCount > 3) xgboostScore += 0.15;
-    if (features.spammyEmojiCount > 0 && features.similarity < 0.15) xgboostScore += 0.2;
     if (features.emojiCount * features.commentLength > 300) xgboostScore += 0.1;
     
     // Clamp scores between 0 and 1
