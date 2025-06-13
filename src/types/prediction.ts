@@ -13,8 +13,18 @@ export interface PredictionResult {
     commentLength: number;
     emojiCount: number;
     emojiTypes: string[];
+    spammyEmojiCount: number;
+    spammyEmojis: string[];
+    spammyWordCount: number;
+    spammyWords: string[];
     similarity: number;
     textComplexity: number;
+  };
+  modelScores?: {
+    logisticRegression: number;
+    randomForest: number;
+    xgboost: number;
+    ensemble: number;
   };
   timestamp: string;
 }

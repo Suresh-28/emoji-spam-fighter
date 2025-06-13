@@ -144,7 +144,7 @@ const SpamDetectionForm: React.FC<SpamDetectionFormProps> = ({ onPrediction }) =
               {/* Confidence Bar */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Confidence Score</span>
+                  <span>Ensemble Confidence Score</span>
                   <span>{(result.confidence * 100).toFixed(1)}%</span>
                 </div>
                 <Progress 
@@ -153,7 +153,28 @@ const SpamDetectionForm: React.FC<SpamDetectionFormProps> = ({ onPrediction }) =
                 />
               </div>
 
-              {/* Feature Analysis */}
+              {/* Model Scores */}
+              {result.modelScores && (
+                <div className="space-y-2 pt-4 border-t">
+                  <div className="text-sm font-medium mb-2">Individual Model Scores:</div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+                    <div className="bg-blue-50 p-2 rounded">
+                      <div className="font-medium">Logistic Regression</div>
+                      <div>{(result.modelScores.logisticRegression * 100).toFixed(1)}%</div>
+                    </div>
+                    <div className="bg-green-50 p-2 rounded">
+                      <div className="font-medium">Random Forest</div>
+                      <div>{(result.modelScores.randomForest * 100).toFixed(1)}%</div>
+                    </div>
+                    <div className="bg-purple-50 p-2 rounded">
+                      <div className="font-medium">XGBoost</div>
+                      <div>{(result.modelScores.xgboost * 100).toFixed(1)}%</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Enhanced Feature Analysis */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
                 <div className="text-center space-y-1">
                   <Hash className="h-4 w-4 mx-auto text-blue-500" />
@@ -164,7 +185,7 @@ const SpamDetectionForm: React.FC<SpamDetectionFormProps> = ({ onPrediction }) =
                 <div className="text-center space-y-1">
                   <Smile className="h-4 w-4 mx-auto text-yellow-500" />
                   <div className="text-sm font-medium">{result.features.emojiCount}</div>
-                  <div className="text-xs text-muted-foreground">Emojis</div>
+                  <div className="text-xs text-muted-foreground">Total Emojis</div>
                 </div>
                 
                 <div className="text-center space-y-1">
@@ -180,13 +201,58 @@ const SpamDetectionForm: React.FC<SpamDetectionFormProps> = ({ onPrediction }) =
                 </div>
               </div>
 
-              {/* Emoji Types */}
+              {/* Spam Analysis Section */}
+              <div className="pt-4 border-t space-y-3">
+                <div className="text-sm font-medium">Spam Analysis:</div>
+                
+                {/* Spammy Emojis */}
+                <div className="bg-red-50 p-3 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-red-700">Spammy Emojis Detected</span>
+                    <Badge variant="destructive" className="text-xs">
+                      {result.features.spammyEmojiCount} found
+                    </Badge>
+                  </div>
+                  {result.features.spammyEmojis.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {result.features.spammyEmojis.map((emoji, index) => (
+                        <span key={index} className="text-lg bg-red-100 px-2 py-1 rounded">{emoji}</span>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-green-600">No spammy emojis detected ✅</div>
+                  )}
+                </div>
+
+                {/* Spammy Keywords */}
+                <div className="bg-orange-50 p-3 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-orange-700">Spammy Keywords Detected</span>
+                    <Badge variant="secondary" className="text-xs bg-orange-200">
+                      {result.features.spammyWordCount} found
+                    </Badge>
+                  </div>
+                  {result.features.spammyWords.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {result.features.spammyWords.map((word, index) => (
+                        <span key={index} className="text-xs bg-orange-100 px-2 py-1 rounded font-mono">
+                          {word}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-green-600">No spammy keywords detected ✅</div>
+                  )}
+                </div>
+              </div>
+
+              {/* All Emojis Found */}
               {result.features.emojiTypes.length > 0 && (
                 <div className="pt-2 border-t">
-                  <div className="text-sm font-medium mb-2">Emojis Found:</div>
+                  <div className="text-sm font-medium mb-2">All Emojis Found:</div>
                   <div className="flex flex-wrap gap-1">
                     {result.features.emojiTypes.map((emoji, index) => (
-                      <span key={index} className="text-lg">{emoji}</span>
+                      <span key={index} className="text-lg bg-gray-100 px-2 py-1 rounded">{emoji}</span>
                     ))}
                   </div>
                 </div>

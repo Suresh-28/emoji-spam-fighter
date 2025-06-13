@@ -1,15 +1,59 @@
 
 import { PredictionRequest, PredictionResult, BulkPredictionRequest } from '@/types/prediction';
 
-// Mock ML service that simulates ensemble learning behavior
+// Enhanced ML service with spammy emojis and keywords detection
 class MLService {
+  // Spammy emojis database
+  private spammyEmojis = [
+    '🔥', '💰', '🎁', '💸', '💥', '😍', '🤩', '✅', '📢', '🚀', 
+    '✨', '🤑', '🔗', '👉'
+  ];
+
+  // Spammy keywords database
+  private spammyKeywords = [
+    'free', 'buy', 'click', 'win', 'winner', 'cash', 'prize', 'offer', 
+    'gift', 'deal', 'limited', 'urgent', 'money', 'now', 'subscribe', 
+    'sale', 'claim', 'order', 'discount', 'guarantee', 'risk-free', 
+    'exclusive', 'save', 'instant', 'cheap', 'amazing', 'miracle', 
+    'congratulations', 'bonus', 'earn'
+  ];
+
   private extractEmojis(text: string): string[] {
     const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
     return text.match(emojiRegex) || [];
   }
 
+  private detectSpammyEmojis(text: string): { 
+    spammyEmojis: string[], 
+    spammyEmojiCount: number,
+    allEmojis: string[]
+  } {
+    const allEmojis = this.extractEmojis(text);
+    const spammyEmojis = allEmojis.filter(emoji => this.spammyEmojis.includes(emoji));
+    
+    return {
+      spammyEmojis,
+      spammyEmojiCount: spammyEmojis.length,
+      allEmojis
+    };
+  }
+
+  private detectSpammyKeywords(text: string): {
+    spammyWords: string[],
+    spammyWordCount: number
+  } {
+    const words = text.toLowerCase().split(/\s+/);
+    const spammyWords = words.filter(word => 
+      this.spammyKeywords.some(keyword => word.includes(keyword))
+    );
+    
+    return {
+      spammyWords: [...new Set(spammyWords)], // Remove duplicates
+      spammyWordCount: spammyWords.length
+    };
+  }
+
   private calculateSimilarity(post: string, comment: string): number {
-    // Simple cosine similarity approximation
     const postWords = post.toLowerCase().split(/\s+/);
     const commentWords = comment.toLowerCase().split(/\s+/);
     
@@ -23,50 +67,67 @@ class MLService {
   }
 
   private calculateTextComplexity(text: string): number {
-    // Simple complexity score based on word length, punctuation, etc.
     const words = text.split(/\s+/);
     const avgWordLength = words.reduce((sum, word) => sum + word.length, 0) / words.length;
     const punctuationCount = (text.match(/[.!?;:,]/g) || []).length;
     const complexityScore = (avgWordLength * 0.3) + (punctuationCount * 0.1) + (words.length * 0.05);
     
-    return Math.min(complexityScore, 10); // Cap at 10
+    return Math.min(complexityScore, 10);
   }
 
-  private simulateEnsemblePredict(features: {
+  private simulateEnhancedEnsemblePredict(features: {
     commentLength: number;
     emojiCount: number;
+    spammyEmojiCount: number;
+    spammyWordCount: number;
     similarity: number;
     textComplexity: number;
     comment: string;
-  }): { isSpam: boolean; confidence: number } {
-    // Simulate ensemble of ML models (Logistic Regression, Random Forest, XGBoost)
+  }): { isSpam: boolean; confidence: number; modelScores: any } {
     
-    // Logistic Regression simulation
-    let logisticScore = 0.5;
-    if (features.emojiCount > 3) logisticScore += 0.2;
-    if (features.commentLength > 200) logisticScore += 0.15;
+    // Enhanced Logistic Regression simulation
+    let logisticScore = 0.3;
+    if (features.spammyEmojiCount > 0) logisticScore += features.spammyEmojiCount * 0.15;
+    if (features.spammyWordCount > 0) logisticScore += features.spammyWordCount * 0.12;
+    if (features.emojiCount > 3) logisticScore += 0.1;
+    if (features.commentLength > 200) logisticScore += 0.08;
     if (features.similarity < 0.1) logisticScore += 0.1;
-    if (features.comment.includes('click') || features.comment.includes('visit')) logisticScore += 0.3;
-    if (features.comment.includes('free') || features.comment.includes('win')) logisticScore += 0.25;
+    if (features.comment.includes('👉') && features.comment.includes('🔗')) logisticScore += 0.2;
     
-    // Random Forest simulation
-    let rfScore = 0.4;
-    if (features.emojiCount > 2) rfScore += 0.3;
-    if (features.textComplexity < 2) rfScore += 0.2;
-    if (features.commentLength > 100 && features.similarity < 0.2) rfScore += 0.4;
+    // Enhanced Random Forest simulation
+    let rfScore = 0.25;
+    if (features.spammyEmojiCount > 1) rfScore += 0.25;
+    if (features.spammyWordCount > 2) rfScore += 0.2;
+    if (features.emojiCount > 2) rfScore += 0.15;
+    if (features.textComplexity < 2) rfScore += 0.15;
+    if (features.commentLength > 100 && features.similarity < 0.2) rfScore += 0.2;
     
-    // XGBoost simulation
-    let xgboostScore = 0.45;
-    if (features.emojiCount * features.commentLength > 300) xgboostScore += 0.35;
-    if (features.similarity < 0.15 && features.textComplexity < 3) xgboostScore += 0.25;
+    // Enhanced XGBoost simulation
+    let xgboostScore = 0.35;
+    if (features.spammyEmojiCount * features.spammyWordCount > 2) xgboostScore += 0.3;
+    if (features.spammyWordCount > 3) xgboostScore += 0.15;
+    if (features.spammyEmojiCount > 0 && features.similarity < 0.15) xgboostScore += 0.2;
+    if (features.emojiCount * features.commentLength > 300) xgboostScore += 0.1;
     
-    // Ensemble voting
-    const avgScore = (logisticScore + rfScore + xgboostScore) / 3;
+    // Clamp scores between 0 and 1
+    logisticScore = Math.min(Math.max(logisticScore, 0), 1);
+    rfScore = Math.min(Math.max(rfScore, 0), 1);
+    xgboostScore = Math.min(Math.max(xgboostScore, 0), 1);
+    
+    // Ensemble voting with weights
+    const weights = { logistic: 0.3, rf: 0.35, xgboost: 0.35 };
+    const avgScore = (logisticScore * weights.logistic) + (rfScore * weights.rf) + (xgboostScore * weights.xgboost);
     const finalScore = Math.min(Math.max(avgScore, 0), 1);
     
     return {
       isSpam: finalScore > 0.5,
-      confidence: finalScore > 0.5 ? finalScore : 1 - finalScore
+      confidence: finalScore > 0.5 ? finalScore : 1 - finalScore,
+      modelScores: {
+        logisticRegression: logisticScore,
+        randomForest: rfScore,
+        xgboost: xgboostScore,
+        ensemble: finalScore
+      }
     };
   }
 
@@ -74,19 +135,24 @@ class MLService {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
 
-    const emojis = this.extractEmojis(request.comment);
+    const emojiAnalysis = this.detectSpammyEmojis(request.comment);
+    const keywordAnalysis = this.detectSpammyKeywords(request.comment);
     const similarity = this.calculateSimilarity(request.post, request.comment);
     const textComplexity = this.calculateTextComplexity(request.comment);
 
     const features = {
       commentLength: request.comment.length,
-      emojiCount: emojis.length,
-      emojiTypes: emojis,
+      emojiCount: emojiAnalysis.allEmojis.length,
+      emojiTypes: emojiAnalysis.allEmojis,
+      spammyEmojiCount: emojiAnalysis.spammyEmojiCount,
+      spammyEmojis: emojiAnalysis.spammyEmojis,
+      spammyWordCount: keywordAnalysis.spammyWordCount,
+      spammyWords: keywordAnalysis.spammyWords,
       similarity,
       textComplexity
     };
 
-    const prediction = this.simulateEnsemblePredict({
+    const prediction = this.simulateEnhancedEnsemblePredict({
       ...features,
       comment: request.comment
     });
@@ -97,6 +163,7 @@ class MLService {
       isSpam: prediction.isSpam,
       confidence: prediction.confidence,
       features,
+      modelScores: prediction.modelScores,
       timestamp: new Date().toISOString()
     };
   }
