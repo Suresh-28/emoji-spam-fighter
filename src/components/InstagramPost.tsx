@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Share, MoreHorizontal, AlertTriangle } from 'lucide-react';
 import { PredictionResult } from '@/types/prediction';
+import MediaExtractor from '@/components/MediaExtractor';
 
 interface InstagramPostProps {
   prediction: PredictionResult;
@@ -31,6 +32,9 @@ const InstagramPost: React.FC<InstagramPostProps> = ({
 
       {/* Post Content */}
       <CardContent className="p-0">
+        {/* Media Content */}
+        <MediaExtractor url={prediction.post} />
+
         {/* Post Text */}
         <div className="p-4">
           <p className="text-sm leading-relaxed">{prediction.post}</p>
