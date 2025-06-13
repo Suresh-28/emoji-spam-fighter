@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +10,7 @@ import { PredictionResult } from '@/types/prediction';
 import { mlService } from '@/services/mlService';
 import { useToast } from '@/hooks/use-toast';
 import EmojiPicker from '@/components/EmojiPicker';
+import InstagramPost from '@/components/InstagramPost';
 
 interface SpamDetectionFormProps {
   onPrediction: (result: PredictionResult) => void;
@@ -106,6 +106,19 @@ const SpamDetectionForm: React.FC<SpamDetectionFormProps> = ({ onPrediction }) =
           )}
         </Button>
       </form>
+
+      {/* Instagram Post Display */}
+      {result && (
+        <div className="space-y-6">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold mb-2">Social Media Post Preview</h3>
+            <p className="text-sm text-muted-foreground">
+              Comment has been classified and organized below
+            </p>
+          </div>
+          <InstagramPost prediction={result} />
+        </div>
+      )}
 
       {result && (
         <Card className="border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
