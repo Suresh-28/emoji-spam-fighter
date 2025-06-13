@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share, MoreHorizontal, AlertTriangle } from 'lucide-react';
+import { Heart, MessageCircle, Share, MoreHorizontal, AlertTriangle, Shield } from 'lucide-react';
 import { PredictionResult } from '@/types/prediction';
 import MediaExtractor from '@/components/MediaExtractor';
 
@@ -46,6 +46,7 @@ const InstagramPost: React.FC<InstagramPostProps> = ({
             <Heart className="h-6 w-6 text-gray-700 hover:text-red-500 cursor-pointer" />
             <MessageCircle className="h-6 w-6 text-gray-700 cursor-pointer" />
             <Share className="h-6 w-6 text-gray-700 cursor-pointer" />
+            <Shield className={`h-6 w-6 cursor-pointer ${prediction.isSpam ? 'text-red-500' : 'text-green-500'}`} />
           </div>
         </div>
 
@@ -56,7 +57,7 @@ const InstagramPost: React.FC<InstagramPostProps> = ({
 
         {/* Comments Section */}
         <div className="px-4 pb-4 space-y-3">
-          {/* Regular Comments Section */}
+          {/* Regular Comments Section - Only show if NOT spam */}
           {!prediction.isSpam && (
             <div className="space-y-2">
               <div className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Comments</div>
@@ -79,7 +80,7 @@ const InstagramPost: React.FC<InstagramPostProps> = ({
             </div>
           )}
 
-          {/* Spam Section */}
+          {/* Spam Section - Only show if IS spam */}
           {prediction.isSpam && (
             <div className="space-y-2 bg-red-50 p-3 rounded-lg border border-red-200">
               <div className="flex items-center gap-2">
