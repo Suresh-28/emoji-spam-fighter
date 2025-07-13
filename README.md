@@ -1,73 +1,40 @@
-# Welcome to your Lovable project
 
-## Project info
+<img width="1905" height="909" alt="Screenshot 2025-07-13 215034" src="https://github.com/user-attachments/assets/1eb215ab-77b4-4c68-bec6-16e23dde728c" />
 
-**URL**: https://lovable.dev/projects/bd850427-1931-4bdb-9c0b-89c63fda714f
+# Emoji Spam Fighter 🚫😈😂
 
-## How can I edit this code?
+An AI-generated, interactive landing page designed to promote and demonstrate a smart solution for detecting and blocking spam that uses emojis in social media, messaging apps, or forums. Built with Lovable AI and crafted with bold visuals and clear messaging.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🌐 Live Demo
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/bd850427-1931-4bdb-9c0b-89c63fda714f) and start prompting.
+See it in action:  
+👉 [emoji-spam-fighter.lovable.app](https://emoji-spam-fighter.lovable.app/)
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## ✨ Features
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- 🤖 **Anti-emoji spam detection** concept presentation  
+- 💬 **Interactive hero section** with bold messaging  
+- 📱 **Fully responsive layout** for all screen sizes  
+- 🎨 **Modern UI design** with animated emoji elements  
+- 🚀 **Customizable and deployable** via GitHub or no-code Lovable AI editor
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🚀 Getting Started
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Prerequisites
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- Node.js ≥ 16  
+- npm or yarn
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Setup Instructions
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+git clone https://github.com/your-username/emoji-spam-fighter.git
+cd emoji-spam-fighter
+npm install
 npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/bd850427-1931-4bdb-9c0b-89c63fda714f) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
